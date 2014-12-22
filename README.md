@@ -1,4 +1,4 @@
-ttlogger
+TTlogger
 ========
 
 Time Tracking log app
