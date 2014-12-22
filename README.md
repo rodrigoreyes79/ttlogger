@@ -1,13 +1,20 @@
 TTlogger
 ========
 
+Time Tracking logging app. 
+
 ![TTLogger image]
 (https://raw.githubusercontent.com/rodrigoreyes79/ttlogger/master/images/ttlogger.png)
 
-Time Tracking logging app. The text entered is saved inside the same folder where TTLogger resides as a log. Ex: 2015-01-01.log
+The text entered is saved inside the same folder where TTLogger resides.
 
-The logged information will be save with the following format: time | Logged text.
-Ex. 12:00 | This is just a test.
+![Folder image]
+(https://raw.githubusercontent.com/rodrigoreyes79/ttlogger/master/images/folder.png)
+
+The logged information will be saved as a simple text file with log extension.
+
+![Log file image]
+(https://raw.githubusercontent.com/rodrigoreyes79/ttlogger/master/images/log.png)
 
 # Installation
 1. Download and install node-webkit on your computer following the instructions at https://github.com/rogerwang/node-webkit#downloads.
