@@ -6,12 +6,12 @@ Time Tracking logging app.
 ![TTLogger image]
 (https://raw.githubusercontent.com/rodrigoreyes79/ttlogger/master/images/ttlogger.png)
 
-The text entered is saved inside the same folder where TTLogger resides.
+The text entered is saved inside the same folder where TTLogger resides. The logged information will be saved as a simple text file.
 
 ![Folder image]
 (https://raw.githubusercontent.com/rodrigoreyes79/ttlogger/master/images/folder.png)
 
-The logged information will be saved as a simple text file with log extension.
+Inside each file, each entry will start with the time of day it was entered.
 
 ![Log file image]
 (https://raw.githubusercontent.com/rodrigoreyes79/ttlogger/master/images/log.png)
