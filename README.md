@@ -11,7 +11,7 @@ The text entered is saved inside the same folder where TTLogger resides. The log
 ![Folder image]
 (https://raw.githubusercontent.com/rodrigoreyes79/ttlogger/master/images/folder.png)
 
-Inside each file, each entry will start with the time of day it was entered.
+Inside each file, each entry will start with the time of day the window was initially opened.
 
 ![Log file image]
 (https://raw.githubusercontent.com/rodrigoreyes79/ttlogger/master/images/log.png)
