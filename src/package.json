@@ -1,0 +1,15 @@
+{
+	"name": "nw-demo",
+	"main": "index.html",
+	"window": {
+		"show": true,
+		"toolbar": false,
+		"frame": true,
+		"position": "center",
+		"width": 600,
+		"height": 400,
+		"min_width": 600,
+		"min_height": 400
+	},
+	"single-instance": false
+}
