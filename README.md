@@ -1,6 +1,9 @@
 TTlogger
 ========
 
+## UPDATE: Feb 26, 2015
+New feature!!! If for whatever reason your TTLogger windows get closed (Ex. A computer restart), you can reopen them by using the Menu -> Reopen option.
+
 Time Tracking logging app. 
 
 ![TTLogger image]
