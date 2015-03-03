@@ -132,7 +132,10 @@ $(function(){
 		unpin(now).done(function(){
 			var win = gui.Window.get();
 			win.hide();
-			setTimeout(win.close, 3000);
+			setTimeout(function(){
+				console.log('Closing window');
+				win.close();
+			}, 3000);
 		});
 	});
 	$('#saveBtn').click(function(){
@@ -141,7 +144,9 @@ $(function(){
 				'log/' + now.format('YYYY-MM-DD') + '.txt', 
 				now.format("HH:mm") + ' | ' + $('#data').val() + '\n',
 				{},
-				function(){window.close();}
+				function(){
+					$('#cancelBtn').click();
+				}
 			)
 		});
 		
