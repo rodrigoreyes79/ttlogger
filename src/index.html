@@ -24,52 +24,53 @@
 			code {
 				font-size: 80%;
 			}
+			.panel {
+				margin-bottom: 0px;
+			}
 		</style>
 	</head>
 	<body>
-		<!-- Fixed navbar -->
-		<div class="navbar navbar-default navbar-fixed-top" role="navigation">
-			<div class="container">
-				<div class="navbar-header">
-					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					</button>
-					<a class="navbar-brand" href="#">TTLogger</a>
-				</div>
-				<div class="collapse navbar-collapse">
-					<ul class="nav navbar-nav">
-						<li><a href="#" id="pinBtn" style="display:none">Pin</a></li>
-						<li><a href="#" id="unpinBtn">Unpin</a></li>
-						<li><a href="#" id="reloadBtn">Reopen</a></li>
-					</ul>
-				</div>
-				<!--/.nav-collapse -->
-			</div>
-		</div>
-		<!-- Begin page content -->
-		<div class="container">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="form-group">
-					    <label for="exampleInputEmail1">What have you done lately? <a href="#" id="refreshLastEntryLink">Refresh Last Entry</a></label>
-					    <textarea id="data" class="form-control" rows="11"></textarea>
+		<div class="panel panel-default">
+		  <div class="panel-heading clearfix">
+		    	<div class="col-xs-3">
+		    		<button type="button" class="btn btn-default" data-bind="click: onPrevPin"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></button>
+		    	</div>
+		    	<div class="col-xs-6">
+		    		<select class="form-control" data-bind="options: pinOptions,
+                       optionsText: 'label',
+                       value: selectedPin">
+		    		</select>
+		    	</div>
+		    	<div class="col-xs-3">
+		    		<button type="button" class="btn btn-default pull-right" data-bind="click: onNextPin"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button>
+		    	</div>
+		  </div>
+		  <div class="panel-body">
+		    <!-- Begin page content -->
+			<div class="">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group">
+						    <label for="exampleInputEmail1">What have you done lately?</label>
+						    <textarea id="data" class="form-control" rows="11" data-bind="textInput: msg"></textarea>
+						</div>
 					</div>
 				</div>
+				<div class="row">
+					<div class="col-xs-6"><button id="cancelBtn" type="button" class="btn btn-primary btn-lg btn-block" data-bind="click:onCancel">Cancel</button></div>
+					<div class="col-xs-6"><button id="saveBtn" type="button" class="btn btn-primary btn-lg btn-block" data-bind="click:onSave">Save</button></div>
+				</div>
 			</div>
-			<div class="row">
-				<div class="col-xs-6"><button id="cancelBtn" type="button" class="btn btn-primary btn-lg btn-block">Cancel</button></div>
-				<div class="col-xs-6"><button id="saveBtn" type="button" class="btn btn-primary btn-lg btn-block">Save</button></div>
-			</div>
+		  </div>
 		</div>
+		
 		<!-- Bootstrap core JavaScript
 			================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->
 		<script src="js/jquery-2.1.1.min.js"></script>
 		<script src="js/moment-2.8.3.js"></script>
 		<script src="js/bootstrap.min.js"></script>
+		<script src="js/knockout-3.2.0.js"></script>
 		<script src="js/app.js"></script>
 	</body>
 </html>

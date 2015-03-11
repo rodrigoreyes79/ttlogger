@@ -7,9 +7,9 @@
 		"frame": true,
 		"position": "center",
 		"width": 600,
-		"height": 400,
+		"height": 407,
 		"min_width": 600,
-		"min_height": 400
+		"min_height": 407
 	},
-	"single-instance": false
+	"single-instance": true
 }

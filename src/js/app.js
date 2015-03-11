@@ -2,166 +2,190 @@ var moment = require('moment');
 var fs = require('fs');
 var utf8 = require('utf8');
 var gui = require('nw.gui');
+var CronJob = require('cron').CronJob;
 
 var lastEntryFile = 'log/.lastEntry.txt';
 var pinFile = 'log/.pins'
 
-function getLastEntry(){
-	if(fs.existsSync(lastEntryFile)){
-		return fs.readFileSync(lastEntryFile, {});
-	}
-	return null;
-}
-
-function writeLastEntry(data, cb){
-	data = utf8.encode(data);
-	console.log(data);
-	fs.writeFile(lastEntryFile, data, {}, cb);
-}
-
-function pin(now){
-	var pins = [];
-	if(fs.existsSync(pinFile)){
-		pins = readJsonFile(pinFile);
-	}
-	var ts = now.unix();
-	var doPin = true;
-	for(var i = 0; i < pins.length; i++){
-		if(pins[i] == ts) {
-			doPin = false;
-			break;
+var ViewModel = function(ts,msg){
+	var self = this;
+	var initialTs = ts;
+	console.log('InitialTs: ' + initialTs);
+	
+	self.pins = ko.observableArray([ts]);
+	self.pinOptions = ko.computed(function() {
+		var ret = [];
+		for(var i = 0; i < self.pins().length; i++){
+			ret.push({"value": self.pins()[i], "label": moment.unix(self.pins()[i]).format("ddd, h:mm A"), "moment": moment.unix(self.pins()[i])});
 		}
-	}
-	if(doPin){
-		pins.push(ts);
-		fs.writeFile(pinFile, JSON.stringify(pins), {});
-	}
-}
-
-function unpin(now){
-	var d = $.Deferred();
-	var ts = now.unix();
-	var pins = [];
-	var newPins = [];
-	if(fs.existsSync(pinFile)){
-		pins = readJsonFile(pinFile);
-	}
-	
-	for(var i = 0; i < pins.length; i++){
-		if(pins[i] == ts) {
-			continue;
-		}
-		newPins.push(pins[i]);
-	}
-	
-	fs.writeFile(pinFile, JSON.stringify(newPins), {}, function(){
-		d.resolve();
+		return ret;
 	});
+	self.selectedPin = ko.observable(self.pinOptions()[self.pinOptions().length - 1]);
+	self.selectedPin.subscribe(function(newValue){
+		if(newValue) document.title = newValue.label; else return '';
+	})
 	
-	return d.promise();
-}
-
-function reload(now){
-	// Loading pinned ts
-	var pins = readJsonFile(pinFile);
-	
-	// Opening a window per pin
-	for(var i = 0; i < pins.length; i++){
-		var pin = pins[i];
-		if(pin != now.unix()){
-			setTimeout(function(pin){ 
-				return function(){
-					var newWin = gui.Window.open('index.html',{
-						"show": true,
-						"toolbar": false,
-						"frame": true,
-						"position": "center",
-						"width": 600,
-						"height": 400,
-						"min_width": 600,
-						"min_height": 400
-					});
-					newWin.on('document-start', function() {
-						console.log('pin: ' + pin);
-						newWin.eval(null, 'sessionStorage.setItem("nowPin", ' + pin + ')');
-					});
-				}
-			}(pin), i * 1000);
-		}
-	}
-}
-
-function readJsonFile(file){
-	var data = fs.readFileSync(file, 'utf8');
-	data = JSON.parse(data);
-	return data;
-}
-
-$(function(){
-	console.log('Starting load');
-	var nowPin = sessionStorage.getItem("nowPin");
-	console.log('nowPin: ' + nowPin);
-	var reloading = false;
-	if(nowPin){
-		now = moment.unix(nowPin);
-		reloading = true;
-	} else {
-		now = moment();
-		pin(now);
-	}	
-	
-	var fmtNow = now.format("ddd, h:mm A");  
-	document.title = fmtNow;
-	
-	if(!fs.existsSync('log')) fs.mkdirSync('log');
-	
-	var lastEntry = null;
-	if(!reloading)
-		lastEntry = getLastEntry();
-	if(lastEntry) {
-		$('#data').val(lastEntry);
-	}
-	$('#data').focus();	
-	
-	$('#refreshLastEntryLink').click(function(){
-		event.preventDefault();
-		var lastEntry = getLastEntry();
-		$('#data').val(lastEntry);
+	self.fmtNow = ko.computed(function() {
+		if(self.selectedPin()) return self.selectedPin().label; else return '';
 	});
-	$('#cancelBtn').click(function(){
-		unpin(now).done(function(){
-			var win = gui.Window.get();
-			win.hide();
-			setTimeout(function(){
-				console.log('Closing window');
-				win.close();
-			}, 3000);
-		});
-	});
-	$('#saveBtn').click(function(){
-		writeLastEntry($('#data').val(), function(){
+	self.msg = ko.observable(msg);
+
+
+	// ---------
+	// Triggers
+	// ---------
+
+	self.onSave = function(){
+		writeLastEntry(self.msg(), function(){
 			fs.appendFile(
-				'log/' + now.format('YYYY-MM-DD') + '.txt', 
-				now.format("HH:mm") + ' | ' + $('#data').val() + '\n',
+				'log/' + self.selectedPin().moment.format('YYYY-MM-DD') + '.txt', 
+				self.selectedPin().moment.format("HH:mm") + ' | ' + self.msg() + '\n',
 				{},
 				function(){
-					$('#cancelBtn').click();
+					self.onCancel();
 				}
 			)
 		});
-		
-	});
-	$('#pinBtn').click(function(){
-		pin(now);
-		$('#pinBtn').hide();
-		$('#unpinBtn').show();
-	});
-	$('#unpinBtn').click(function(){
-		unpin(now);
-		$('#pinBtn').show();
-		$('#unpinBtn').hide();
-	});
-	$('#reloadBtn').click(function(){
-		reload(now);
-	});
+	}
+
+	self.onCancel = function(){
+		unPin(self.selectedPin().value);
+	}
+
+	self.onPin = function(){
+		pin(moment().unix());
+	}
+
+	self.onUnpin = function(){
+		unpin();
+	}
+
+	self.onNextPin = function(){
+		var index = getPinIndex(self.selectedPin().value);
+		if(index > -1){
+			index++;
+			
+			if(index > self.pins().length -1){
+				index = 0;
+			}
+			self.selectedPin(self.pinOptions()[index]);
+		}
+	}
+
+	self.onPrevPin = function(){
+		var index = getPinIndex(self.selectedPin().value);
+		if(index > -1){
+			index--;
+			
+			if(index < 0){
+				index = self.pins().length -1;
+			}
+			self.selectedPin(self.pinOptions()[index]);
+		}
+
+	}
+
+	// ------
+	// Logic
+	// ------
+
+	self.loadPins = function(){
+		var pins = [];
+		if(fs.existsSync(pinFile)){
+			pins = readJsonPinFile(pinFile);
+		}
+		console.log('Loaded pins: ' + pins);
+		self.pins(pins);
+		pin(initialTs);
+	}
+
+	var pin = function(ts){
+		console.log('Pinning ' + ts);
+		self.pins.push(ts);
+		self.selectedPin(self.pinOptions()[self.pinOptions().length - 1]);
+		saveJsonPinFile(pinFile);
+	}
+
+	var unPin = function(){
+		var newPins = [];
+		var index = -1;
+		for(var i = 0; i < self.pins().length; i++){
+			index = getPinIndex(self.pins()[i]);
+			if(index > -1){
+				console.log('Found at index '+ i);
+				continue;
+			}
+			newPins.push(self.pins()[i]);
+		}
+		if(index == newPins.length) index--;
+		if(index == -1) index = 0;
+		if(newPins.length == 0) newPins.push(moment().unix());
+
+		self.pins(newPins);
+		self.selectedPin(self.pinOptions()[index]);
+		return saveJsonPinFile(pinFile);
+	}
+
+	var getPinIndex = function(ts){
+		var index = -1;
+		for(var i = 0; i < self.pins().length; i++){
+			if(self.pins()[i] == ts && index < 0){
+				console.log('Found at index '+ i);
+				index = i;
+				break;
+			}
+		}
+		return index;
+	}
+
+	var getLastEntry = function(){
+		if(fs.existsSync(lastEntryFile)){
+			return fs.readFileSync(lastEntryFile, {});
+		}
+		console.log('No lastEntryFile');
+		return '';
+	}
+	self.getLastEntry = getLastEntry;
+
+	var writeLastEntry = function(data, cb){
+		console.log('About to write "' + data + '"');
+		try {
+			data = utf8.encode(data.toString());
+		} catch(e) {
+			console.log('Error UTF8 encoding');
+		}
+		console.log(data);
+		fs.writeFile(lastEntryFile, data, {}, cb);
+	}
+
+	var saveJsonPinFile = function(file){
+		var d = $.Deferred();
+		fs.writeFile(file, JSON.stringify(self.pins()), {}, function(){
+			d.resolve();
+		});
+		return d.promise();
+	}
+
+	var readJsonPinFile = function(file){
+		var data = fs.readFileSync(file, 'utf8');
+		data = JSON.parse(data);
+
+		return data;
+	}
+}
+
+$(function(){
+	if(!fs.existsSync('log')) fs.mkdirSync('log');
+
+	console.log('Starting load');
+	var vm = new ViewModel(moment().unix());
+	vm.loadPins();
+	vm.msg(vm.getLastEntry());
+
+	ko.applyBindings(vm);
+	$('#data').focus();	
+                 
+	new CronJob('0 0 6-18 * * 1-5', function(){
+		vm.onPin();
+	}, null, true, "America/Guayaquil");
 });
