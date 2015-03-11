@@ -108,17 +108,11 @@ var ViewModel = function(ts,msg){
 
 	var unPin = function(){
 		var newPins = [];
-		var index = -1;
+		var index = getPinIndex(self.selectedPin().value);
 		for(var i = 0; i < self.pins().length; i++){
-			index = getPinIndex(self.pins()[i]);
-			if(index > -1){
-				console.log('Found at index '+ i);
-				continue;
-			}
+			if(i == index) continue
 			newPins.push(self.pins()[i]);
 		}
-		if(index == newPins.length) index--;
-		if(index == -1) index = 0;
 		if(newPins.length == 0) newPins.push(moment().unix());
 
 		self.pins(newPins);
