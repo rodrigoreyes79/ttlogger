@@ -179,7 +179,7 @@ $(function(){
 	ko.applyBindings(vm);
 	$('#data').focus();	
                  
-	new CronJob('0 0 6-18 * * 1-5', function(){
+	new CronJob('0 0 8-18 * * 1-5', function(){
 		vm.onPin();
 	}, null, true, "America/Guayaquil");
 });
