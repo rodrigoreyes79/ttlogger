@@ -7,7 +7,8 @@ Time Tracking logging app.
 (https://raw.githubusercontent.com/rodrigoreyes79/ttlogger/master/images/ttlogger.png)
 
 ### Update: Mar 12, 2015
-Version 0.2 it out and gone are the days of multiple windows!!! 
+Version 0.2 is out and gone are the days of multiple windows!!!
+
 TTLogger now opens only one window and allows you to enter your log for a specific time by selecting it from a select on top of the window. Give it a try!!!
 
 # How it works
@@ -26,5 +27,4 @@ Inside each file, each entry will start with the time of day the window was init
 2. Make sure to add the node-webkit executable to your path.
 3. Download or clone the repository.
 4. Go to the src folder and execute "nw ."
-5. Optional: Add a cron job / scheduled task to execute it at regular intervals.
-
+5. Optional: Update CronJob configuration at the end of the src/js/app.js file.
