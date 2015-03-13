@@ -1,14 +1,16 @@
 TTlogger
 ========
 
-## UPDATE: Feb 26, 2015
-New feature!!! If for whatever reason your TTLogger windows get closed (Ex. A computer restart), you can reopen them by using the Menu -> Reopen option.
-
 Time Tracking logging app. 
 
 ![TTLogger image]
 (https://raw.githubusercontent.com/rodrigoreyes79/ttlogger/master/images/ttlogger.png)
 
+### Update: Mar 12, 2015
+Version 0.2 it out and gone are the days of multiple windows!!! 
+TTLogger now opens only one window and allows you to enter your log for a specific time by selecting it from a select on top of the window. Give it a try!!!
+
+# How it works
 The text entered is saved inside the same folder where TTLogger resides. The logged information will be saved as a simple text file.
 
 ![Folder image]
