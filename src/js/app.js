@@ -1,11 +1,15 @@
 var moment = require('moment');
 var fs = require('fs');
 var utf8 = require('utf8');
-var gui = require('nw.gui');
-var CronJob = require('cron').CronJob;
+var gui = require('nw.gui')
+var CronJob = require('cron').CronJob;;
+var http = require('http');
 
 var lastEntryFile = 'log/.lastEntry.txt';
 var pinFile = 'log/.pins'
+var cronExp = null;
+//var cronExp = '0 0 8-18 * * 1-5';
+var PORT = 8081;
 
 var ViewModel = function(ts,msg){
 	var self = this;
@@ -16,7 +20,7 @@ var ViewModel = function(ts,msg){
 	self.pinOptions = ko.computed(function() {
 		var ret = [];
 		for(var i = 0; i < self.pins().length; i++){
-			ret.push({"value": self.pins()[i], "label": moment.unix(self.pins()[i]).format("ddd, h:mm A"), "moment": moment.unix(self.pins()[i])});
+			ret.push({"value": self.pins()[i], "label": moment.unix(self.pins()[i]).format("ddd DD, h:mm A"), "moment": moment.unix(self.pins()[i])});
 		}
 		return ret;
 	});
@@ -99,6 +103,11 @@ var ViewModel = function(ts,msg){
 		pin(initialTs);
 	}
 
+	self.focus = function(){
+		var win = gui.Window.get();
+		win.focus();
+	}
+
 	var pin = function(ts){
 		console.log('Pinning ' + ts);
 		self.pins.push(ts);
@@ -178,8 +187,26 @@ $(function(){
 
 	ko.applyBindings(vm);
 	$('#data').focus();	
-                 
-	new CronJob('0 0 8-18 * * 1-5', function(){
-		vm.onPin();
-	}, null, true, "America/Guayaquil");
+
+	function handleRequest(request, response){
+		console.log('Calling handleRequest');
+	    vm.onPin();
+		vm.focus();
+		response.end('');
+	}
+
+	//Create a server
+	var server = http.createServer(handleRequest);
+
+	//Lets start our server
+	server.listen(PORT, function(){
+	    //Callback triggered when server is successfully listening. Hurray!
+	    console.log("Server listening on: http://localhost:" + PORT);
+	});
+
+	if(cronExp){
+		new CronJob(cronExp, function(){
+			vm.onPin();
+		}, null, true, "America/Guayaquil");
+	}
 });
