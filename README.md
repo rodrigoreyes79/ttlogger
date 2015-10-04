@@ -28,3 +28,11 @@ Inside each file, each entry will start with the time of day the window was init
 3. Download or clone the repository.
 4. Go to the src folder and execute "nw ."
 5. Optional: Update CronJob configuration at the end of the src/js/app.js file.
+
+## Setup to run in OSX every hour
+1. Move nwjs.app to Applications folder.
+2. Open the terminal an run "crontab -e"
+2. Add this line in the editor 
+*1 * * * * open -a /Applications/nwjs.app/Contents/MacOS/nwjs --args /Users/username/<path_to_ttlogger/src/*
+
+This will run ttloger the first minute of every hour.
