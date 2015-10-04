@@ -54,6 +54,7 @@ var ViewModel = function(ts,msg){
 
 	self.onCancel = function(){
 		unPin(self.selectedPin().value);
+		window.close();
 	}
 
 	self.onPin = function(){
